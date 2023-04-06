@@ -1,7 +1,9 @@
+import java.util.Arrays;
+
 public class ProductManager {
 
     private ProductRepository repo;
-    Ticket[] tickets = new Ticket[0];
+
 
     public ProductManager(ProductRepository repo) {
 
@@ -15,29 +17,40 @@ public class ProductManager {
 
     public Ticket[] findAll(String from, String to) {
 
-
-
-        Ticket[] tmp = new Ticket[tickets.length - 1];
-        int copyToIndex = 0;
+        Ticket[] result = new Ticket[0];
         for (Ticket ticket : repo.findAll()) {
-            if (ticket.getStartAirport() == from && ticket.getEndAirport() == to) {
-                tmp[copyToIndex] = ticket;
-                copyToIndex++;
+            if (matchesStart(ticket, from) && matchesEnd(ticket, to)) {
+                Ticket[] tmp = new Ticket[result.length + 1];
+                for (int i = 0; i < result.length; i++) {
+                    tmp[i] = result[i];
+                }
+                tmp[tmp.length - 1] = ticket;
+                result = tmp;
             }
         }
-        tickets = tmp;
-        return tickets;
+        TicketPriceComparator priceComparator = new TicketPriceComparator();
+
+        Arrays.sort(result, priceComparator);
+
+        return result;
     }
 
 
-//    public boolean matches(Ticket product, String search) {
-//        if (product.getName().contains(search)) {
-//            return true;
-//        } else {
-//            return false;
-//        }
-//
-//    }
+    public boolean matchesStart(Ticket ticket, String from) {
+        if (ticket.getStartAirport().contains(from)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean matchesEnd(Ticket ticket, String to) {
+        if (ticket.getEndAirport().contains(to)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 
 }
